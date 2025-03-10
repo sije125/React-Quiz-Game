@@ -1,0 +1,125 @@
+AI-Powered Quiz App
+
+Overview
+
+This is an AI-powered chatbot-based quiz application built using React and Azure. The application fetches questions from an external API, processes them, and allows users to take quizzes with shuffled answer choices. It normalizes and decodes question data before rendering it in the UI.
+
+Features
+
+Fetches quiz questions from an external API
+
+Normalizes and decodes question data for display
+
+Randomizes answer choices for each question
+
+Uses React's useReducer for state management
+
+Implements error handling for missing or undefined data
+
+Technologies Used
+
+Frontend: React (useReducer, useEffect, useState)
+
+Backend: Azure-based AI processing
+
+State Management: React Reducer Hook
+
+Data Handling: API Fetching, JSON Processing
+
+Installation
+
+Prerequisites
+
+Node.js installed
+
+npm or yarn installed
+
+Setup
+
+Clone the repository:
+
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+
+Install dependencies:
+
+npm install
+
+Start the development server:
+
+npm start
+
+Project Structure
+
+/src
+   ├── components       # React components (Quiz UI, Buttons, etc.)
+   ├── context          # QuizProvider using useReducer
+   ├── utils            # Utility functions (shuffleAnswers, normalizeQuestions)
+   ├── api              # API request handling
+   ├── App.js           # Main application file
+   ├── index.js         # Entry point
+
+Key Functions
+
+normalizeQuestions(backendQuestions)
+
+Processes the API response to extract and decode questions and answers.
+
+export const normalizeQuestions = (backendQuestions = []) => {
+    return backendQuestions.map((backendQuestion) => {
+        if (!backendQuestion.correct_answer || !backendQuestion.incorrect_answers) {
+            console.warn("normalizeQuestions received an invalid question:", backendQuestion);
+            return null;
+        }
+
+        return {
+            correctAnswer: decodeURIComponent(backendQuestion.correct_answer),
+            question: decodeURIComponent(backendQuestion.question),
+            incorrectAnswers: backendQuestion.incorrect_answers.map((incorrectAnswer) =>
+                decodeURIComponent(incorrectAnswer)
+            ),
+        };
+    }).filter(Boolean);
+};
+
+shuffleAnswers(question)
+
+Shuffles the order of correct and incorrect answers.
+
+export const shuffleAnswers = (question = {}) => {
+    if (!question.correctAnswer || !question.incorrectAnswers) {
+        console.warn("shuffleAnswers received an undefined question:", question);
+        return [];
+    }
+
+    const unshuffledAnswers = [
+        question.correctAnswer,
+        ...question.incorrectAnswers
+    ];
+
+    return unshuffledAnswers
+        .map((answer) => ({
+            sort: Math.random(),
+            value: answer,
+        }))
+        .sort((a, b) => a.sort - b.sort)
+        .map((a) => a.value);
+};
+
+Error Handling
+
+Logs warnings for undefined or malformed data
+
+Ensures functions return safe defaults instead of crashing
+
+Uses useEffect to wait for API data before rendering
+
+Future Improvements
+
+Add user authentication and progress tracking
+
+Improve UI with animations and better accessibility
+
+Expand question categories and difficulty levels
+
+Implement a backend for custom quiz creation
